@@ -1,0 +1,76 @@
+# =====================
+# Python Backend
+# =====================
+
+venv/
+.env
+__pycache__/
+*.py[cod]
+*.db
+*.sqlite3
+
+# Logs
+*.log
+
+
+# =====================
+# FastAPI Upload Files
+# =====================
+
+uploads/
+media/
+storage/
+generated/
+temp/
+
+# User uploaded images/videos
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.jpg
+*.jpeg
+*.png
+
+
+# =====================
+# AI / ML Files
+# =====================
+
+*.pt
+*.pth
+*.bin
+*.onnx
+
+
+# =====================
+# React Frontend
+# =====================
+
+node_modules/
+dist/
+build/
+
+.env.local
+.env.development
+.env.production
+
+
+# =====================
+# IDE Files
+# =====================
+
+.vscode/
+.idea/
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+
+# =====================
+# Git
+# =====================
+
+*.zip
+*.rar

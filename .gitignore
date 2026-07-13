@@ -1,0 +1,44 @@
+# Python
+venv/
+backend/venv/
+__pycache__/
+*.pyc
+.env
+
+# Database
+*.db
+*.sqlite3
+
+# User uploads
+backend/app/uploads/
+
+# Generated QR codes (agar runtime me generate hote hain)
+backend/app/qr_codes/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+
+# IDE
+.vscode/
+.idea/
+
+# Python cache
+**/__pycache__/
+*.pyc
+
+# AI generated files
+backend/app/uploads/
+backend/app/embeddings/
+backend/app/descriptors/
+backend/app/qr_codes/
+
+venv/
+backend/venv/
+frontend/node_modules/
+backend/node_modules/
+backend/app/uploads/
+__pycache__/
+*.pyc
+.env
