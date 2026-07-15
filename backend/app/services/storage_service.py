@@ -1,5 +1,7 @@
 from pathlib import Path
 import shutil
+import os
+import stat
 
 UPLOAD_ROOT = Path("app/uploads")
 
@@ -49,6 +51,12 @@ def delete_memory_files(
             file.unlink()
 
 
+
+def remove_readonly(func, path, excinfo):
+    os.chmod(path, stat.S_IWRITE)
+    func(path)
+
+
 def delete_album_folder(
     user_id: int,
     album_code: str,
@@ -61,4 +69,4 @@ def delete_album_folder(
     )
 
     if album_folder.exists():
-        shutil.rmtree(album_folder)
+        shutil.rmtree(album_folder, onerror=remove_readonly)

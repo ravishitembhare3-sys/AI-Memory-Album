@@ -12,7 +12,7 @@ def orb_score(scan_descriptor, stored_descriptor):
     matches = bf.match(scan_descriptor, stored_descriptor)
     matches = sorted(matches, key=lambda x: x.distance)
 
-    good = [m for m in matches if m.distance < 50]
+    good = [m for m in matches if m.distance < 35]
 
     return len(good)
 
@@ -32,8 +32,8 @@ def clip_score(scan_embedding, stored_embedding):
 def hybrid_score(
     orb,
     clip,
-    orb_weight=0.4,
-    clip_weight=0.6
+    orb_weight=0.6,
+    clip_weight=0.4
 ):
     orb = min(orb / 100.0, 1.0)
 

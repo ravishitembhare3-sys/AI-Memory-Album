@@ -79,6 +79,42 @@ function AlbumDetails() {
     }
 
 };
+
+     const deleteAlbum = async () => {
+
+    const confirmDelete = window.confirm(
+        "Delete this album?"
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+
+        await api.delete(`/album/${album.id}`);
+
+        alert("Album Deleted Successfully");
+
+        navigate("/dashboard");
+
+    } catch (err) {
+
+        console.log(err);
+
+        alert("Failed to delete album");
+
+    }
+
+};
+
+const copyPublicLink = () => {
+
+    const link = `http://localhost:5173/public/${album.album_code}`;
+
+    navigator.clipboard.writeText(link);
+
+    alert("Public Link Copied!");
+
+};
     if (!album) {
 
         return (
@@ -134,6 +170,19 @@ function AlbumDetails() {
                     >
                         Back
                     </button>
+
+                    <button
+    onClick={deleteAlbum}
+    className="bg-red-600 hover:bg-red-700 px-5 py-2 rounded-xl"
+>
+    Delete Album
+</button>
+                 <button
+    onClick={copyPublicLink}
+    className="bg-purple-600 hover:bg-purple-700 px-5 py-2 rounded-xl"
+>
+    Copy Public Link
+</button>
 
                     <button
     onClick={() => navigate(`/ai-scan/${id}`)}

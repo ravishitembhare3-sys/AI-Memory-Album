@@ -37,11 +37,11 @@ def find_best_match(scan_image_path, embedding_folder):
         )
 
 
-        stored_clip = np.load(clip_path)
+        stored_clip = np.load(clip_path, allow_pickle=False).copy()
 
 
         if os.path.exists(orb_path):
-            stored_orb = np.load(orb_path)
+            stored_orb = np.load(orb_path, allow_pickle=False).copy()
         else:
             stored_orb = None
 
@@ -65,19 +65,27 @@ def find_best_match(scan_image_path, embedding_folder):
 
 
         print(
-            image_name,
-            "ORB:",
-            orb,
-            "CLIP:",
-            clip,
-            "HYBRID:",
-            score
-        )
+    image_name,
+    "ORB:",
+    orb,
+    "CLIP:",
+    clip,
+    "HYBRID:",
+    score
+)
 
 
         if score > best_score:
             best_score = score
             best_image = image_name
 
+
+    # Minimum confidence required
+
+        print("BEST IMAGE:", best_image)
+        print("BEST SCORE:", best_score)
+ 
+        if best_score < 0.20:
+         return None, best_score
 
     return best_image, best_score

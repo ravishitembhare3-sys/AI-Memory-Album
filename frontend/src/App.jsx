@@ -10,6 +10,7 @@ import PublicAlbum from "./pages/PublicAlbum";
 import CreateAlbum from "./pages/CreateAlbum";
 import AlbumDetails from "./pages/AlbumDetails";
 import AIScan from "./pages/AIScan";
+import WatchVideo from "./pages/WatchVideo";
 
 function App() {
     return (
@@ -36,6 +37,7 @@ function App() {
 
             {/* Public Album */}
             <Route path="/public/:albumCode" element={<PublicAlbum />} />
+            <Route path="/watch" element={<WatchVideo />} />
 
         </Routes>
     );

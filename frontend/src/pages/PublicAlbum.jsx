@@ -1,147 +1,141 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
+import Webcam from "react-webcam";
 import api from "../services/api";
-import { useNavigate } from "react-router-dom";
 
 function PublicAlbum() {
-
     const { albumCode } = useParams();
 
     const [album, setAlbum] = useState(null);
-    const [memories, setMemories] = useState([]);
-    const navigate = useNavigate();
+    const [result, setResult] = useState(null);
+    const [loading, setLoading] = useState(false);
+
+    const webcamRef = useRef(null);
 
     useEffect(() => {
         loadAlbum();
     }, []);
 
     const loadAlbum = async () => {
-
         try {
-
             const res = await api.get(`/public/${albumCode}`);
-
             setAlbum(res.data.album);
-
-            setMemories(res.data.memories);
-
         } catch (err) {
-
             console.log(err);
-
             alert("Album Not Found");
+        }
+    };
 
+    const scanPhoto = async () => {
+        const imageSrc = webcamRef.current.getScreenshot();
+
+        if (!imageSrc) {
+            alert("Capture Failed");
+            return;
         }
 
+        const blob = await (await fetch(imageSrc)).blob();
+
+        const formData = new FormData();
+        formData.append("photo", blob, "scan.jpg");
+
+        try {
+            setLoading(true);
+
+            const res = await api.post(
+                `/api/scan/${albumCode}`,
+                formData,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
+            );
+
+            setResult(res.data);
+
+            window.location.href = `/watch?video=${encodeURIComponent(res.data.video)}`;
+
+        } catch (err) {
+            console.log(err);
+            alert("No Match Found");
+        } finally {
+            setLoading(false);
+        }
     };
 
     if (!album) {
-
         return (
             <div className="min-h-screen bg-zinc-950 text-white flex justify-center items-center">
                 Loading...
             </div>
         );
-
     }
 
     return (
-
         <div className="min-h-screen bg-zinc-950 text-white">
 
             <div className="border-b border-zinc-800 p-8">
 
                 <h1 className="text-4xl font-bold">
-
                     {album.name}
-
                 </h1>
 
                 <p className="text-zinc-400 mt-2">
-
                     Client : {album.client_name}
-
                 </p>
-
-                <p className="text-zinc-500">
-
-                    Album Code : {album.album_code}
-
-                </p>
-            
-            <button
-    onClick={() => navigate(`/public-ai-scan/${album.album_code}`)}
-    className="mt-5 bg-green-600 hover:bg-green-700 px-5 py-2 rounded-xl"
->
-    🤖 AI Scan
-</button>
 
             </div>
 
             <div className="p-8">
 
-                <h2 className="text-2xl font-bold mb-6">
-
-                    Memories
-
+                <h2 className="text-3xl font-bold mb-6">
+                    Scan Your Photo
                 </h2>
 
-                <div className="grid grid-cols-3 gap-6">
+                <Webcam
+                    ref={webcamRef}
+                    screenshotFormat="image/jpeg"
+                    className="rounded-xl w-[500px]"
+                />
 
-                    {memories.map((memory) => (
-
-                        <div
-                            key={memory.id}
-                            className="bg-zinc-900 rounded-2xl overflow-hidden"
-                        >
-
-                            <img
-                                src={memory.photo}
-                                alt={memory.title}
-                                className="w-full h-56 object-cover"
-                            />
-
-                            <div className="p-5">
-
-                                <h3 className="text-xl font-bold">
-
-                                    {memory.title}
-
-                                </h3>
-
-                                <button
-                                    onClick={() => window.open(memory.video, "_blank")}
-                                    className="mt-4 bg-blue-600 hover:bg-blue-700 px-5 py-2 rounded-xl"
-                                >
-
-                                    ▶ Play Video
-
-                                </button>
-
-                            </div>
-
-                        </div>
-
-                    ))}
-
-                    {memories.length === 0 && (
-
-                        <div className="text-zinc-400">
-
-                            No Memories Found
-
-                        </div>
-
-                    )}
-
-                </div>
+                <button
+                    onClick={scanPhoto}
+                    className="mt-5 bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-xl"
+                >
+                    {loading ? "Scanning..." : "Scan Photo"}
+                </button>
 
             </div>
 
+            {result && (
+
+                <div className="p-8">
+
+                    <h2 className="text-3xl font-bold mb-5">
+                        Matched Memory
+                    </h2>
+
+                    <img
+                        src={result.photo}
+                        alt={result.title}
+                        className="w-[450px] rounded-xl"
+                    />
+
+                    <video
+                        controls
+                        autoPlay
+                        className="mt-5 w-[600px] rounded-xl"
+                    >
+                        <source src={result.video} type="video/mp4" />
+                    </video>
+
+                </div>
+
+            )}
+
         </div>
-
     );
-
 }
 
 export default PublicAlbum;

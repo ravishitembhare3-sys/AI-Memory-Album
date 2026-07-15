@@ -214,15 +214,15 @@ def delete_memory(
 # Scan Memory (Hybrid AI)
 # ==========================
 
-@router.post("/scan")
+@router.post("/scan/{album_code}")
 async def scan_memory(
-    album_id: int = Form(...),
+    album_code: str,
     photo: UploadFile = File(...),
     db: Session = Depends(get_db)
 ):
 
     album = db.query(Album).filter(
-        Album.id == album_id
+        Album.album_code == album_code
     ).first()
 
     if album is None:
@@ -237,23 +237,34 @@ async def scan_memory(
         shutil.copyfileobj(photo.file, buffer)
 
     folders = get_album_folder(
-    album.user_id,
-    album.album_code
-)
-
-    best_image, score = find_best_match(
-    temp_path,
-      str(folders["embeddings"])
-)
-
-    if best_image is None:
-       raise HTTPException(
-        status_code=404,
-        detail="No matching memory found"
+        album.user_id,
+        album.album_code
     )
 
+    best_image, score = find_best_match(
+        temp_path,
+        str(folders["embeddings"])
+    )
+
+    print("BEST IMAGE:", best_image)
+
+    all_memories = db.query(Memory).filter(
+    Memory.album_id == album.id
+    ).all()
+
+    for m in all_memories:
+     print("DB PHOTO:", m.photo)
+
+    if best_image is None:
+        raise HTTPException(
+            status_code=404,
+            detail="No matching memory found"
+        )
+    
+
     memory = db.query(Memory).filter(
-    Memory.photo == best_image
+        Memory.photo == best_image,
+        Memory.album_id == album.id
     ).first()
 
     if memory is None:
@@ -263,9 +274,8 @@ async def scan_memory(
         )
 
     return {
-    "title": memory.title,
-    "album_id": memory.album_id,
-    "score": score,
-    "photo": f"http://127.0.0.1:8000/uploads/user_{album.user_id}/album_{album.album_code}/photos/{memory.photo}",
-    "video": f"http://127.0.0.1:8000/uploads/user_{album.user_id}/album_{album.album_code}/videos/{memory.video}",
-}
+        "title": memory.title,
+        "score": score,
+        "photo": f"http://127.0.0.1:8000/uploads/user_{album.user_id}/album_{album.album_code}/photos/{memory.photo}",
+        "video": f"http://127.0.0.1:8000/uploads/user_{album.user_id}/album_{album.album_code}/videos/{memory.video}"
+    }
