@@ -24,7 +24,7 @@ AI Memory Album is a full-stack web application that allows users to create digi
 ### Backend
 - FastAPI
 - SQLAlchemy
-- PostgreSQL
+- sql-lite
 - JWT Authentication
 
 ### AI
